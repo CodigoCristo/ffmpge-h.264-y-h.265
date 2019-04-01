@@ -1,0 +1,118 @@
+-vf scale=w=720:h=480:force_original_aspect_ratio=increase -g 1 -bf 0 -vb 0 -crf 20 -vcodec libx264 -ab 90k -acodec aac -preset ultrafast
+
+
+-vf scale=480:-2:force_original_aspect_ratio=increase -g 1 -bf 0 -vb 0 -crf 20 -vcodec libx264 -ab 90k -acodec aac -preset ultrafast
+
+-vf scale=720:-2:force_original_aspect_ratio=increase -g 1 -bf 0 -vb 0 -crf 20 -vcodec libx264 -ab 90k -acodec aac -preset ultrafast
+
+
+-vf scale=w=480:h=360:force_original_aspect_ratio=increase -crf 30 -vcodec libx265 -c:a aac -b:a 90k -preset ultrafast -x265-params lossless=1
+
+
+properties=x264-medium f=mp4 vcodec=libx264 acodec=aac g=120 crf=%quality ab=%audiobitrate+'k'
+
+
+x264 --fullhelp  
+x265 --fullhelp  
+
+-aspect[:stream_specifier]
+//For example "4:3", "Jog Shuttle16:9", "1.3333", and "1.7777" are valid argument values.
+
+-r 24
+// output file to 24 fps
+
+-o mkv
+//Salida en formato de video mkv
+
+-vf scale=w=480:h=360:force_original_aspect_ratio=increase
+//Escalar para la resolución.
+// -vf scale=-1:720
+
+-g 1 -bf 0 -vb 0
+//Opciones adicionales siempre que sepa que no están en conflicto con el estándar
+
+-crf 15
+//Calidad de imagen scale is 0–51
+donde 0 es sin pérdida, 23 es el valor predeterminado y 51 es la peor calidad posible. Un valor más bajo generalmente conduce a una calidad más alta, y un rango subjetivamente sano es de 17-28. Considera que 17 o 18 son visualmente sin pérdida
+//Sugerencia: si está buscando una salida que sea aproximadamente "sin pérdidas visuales" pero que no tenga pérdmkvidas técnicas, use un valor de -crf de alrededor de 17 o 18
+
+
+-vcodec libx264
+//Libreria a usar h.264
+// -c:v libx264
+
+
+-ab 90k
+//Frecuencia de audio
+// -b:a 128k
+
+-acodec aac
+//Codec de audio
+//  -c:a aac
+// AAC audio at 128 kBit/s.
+// -c:a aac -b:a 128k
+
+
+ffmpeg -i input -c:v libx264 -b:v 1M -maxrate 1M -bufsize 2M -pass 1 -f mp4 /dev/null
+ffmpeg -i input -c:v libx264 -b:v 1M -maxrate 1M -bufsize 2M -pass 2 output.mp4
+//Two-Pass h.264
+//Esto efectivamente "apuntará" -crf 23, pero si la salida supera 1 MBit / s, el codificador aumentaría el CRF para evitar picos de tasa de bits. Sin embargo, tenga en cuenta que libx264 no controla estrictamente la velocidad de bits máxima como especificó (la velocidad de bits máxima puede ser superior a 1M para el archivo anterior). Para alcanzar una tasa de bits máxima perfecta, use dos pasos
+
+
+
+ffmpeg -y -i input -c:v libx265 -b:v 2600k -x265-params pass=1 -an -f mp4 /dev/null && \
+ffmpeg -i input -c:v libx265 -b:v 2600k -x265-params pass=2 -c:a aac -b:a 128k output.mp4
+//two-pass h.265
+
+
+
+ultrafast
+superfast
+veryfast
+faster
+fast
+medium – default preset
+slow
+slower
+veryslow
+placebo
+
+
+
+
+
+properties=x264-medium f=mp4 vcodec=libx264 acodec=aac g=120 crf=%23 ab=%160+'k'
+
+
+preset=slower
+preset=medium
+preset=faster
+preset=ultrafast
+
+mkv
+
+
+properties=x265-medium f=mp4 vcodec=libx265 acodec=aac crf=%quality ab=%audiobitrate+'k'
+
+preset=slower
+preset=medium
+preset=faster
+preset=ultrafast
+
+
+
+240p = 352 x 240
+360p = 480 x 360
+480p = 858 x 480 — also known as SD
+720p = 1280 x 720 — the old TVs of this resolution were marked HDready
+1080p = 1920 x 1080 — FullHD
+2160p = 3860 x 2160 — Ultra-HD, also known as 4K 
+
+
+
+https://trac.ffmpeg.org/wiki/Encode/H.264
+https://ffmpeg.org/ffmpeg.html
+https://www.mltframework.org/plugins/ConsumerAvformat/
+https://trac.ffmpeg.org/wiki/Scaling
+https://userbase.kde.org/Kdenlive/Manual/es
+
